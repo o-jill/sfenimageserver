@@ -1,4 +1,9 @@
-use axum::{extract::Query, routing::get, Router};
+use axum::{
+    extract::Query,
+    http::header::{HeaderMap, HeaderValue},
+    routing::get,
+    Router,
+};
 use serde::{de, Deserialize, Deserializer};
 use std::{fmt, str::FromStr};
 
@@ -14,12 +19,23 @@ fn app() -> Router {
     Router::new().route("/", get(handler))
 }
 
-/*async fn handler(query: Query<collections::HashMap<String, String>>) -> String {
-    format!("{:?}", query)
-}*/
+async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
+    let svg = format!("<?xml version='1.0'?>\n\
+    <svg width='300' height='100' viewBox='0 0 300 100' version='1.1' xmlns='http://www.w3.org/2000/svg' >\n\
+    <style>\n\
+    /* <![CDATA[ */\n\
+    text {{font-size: 10px;}}\n\
+    /* ]]> */\n\
+    </style>\n\
+    <g><text x=\"30\" y=\"30\" value=\"aaaaaaaaaa\">{:?}</text></g>\n\
+    </svg>\n", params);
 
-async fn handler(Query(params): Query<Params>) -> String {
-    format!("{:?}", params)
+    let mut h = HeaderMap::new();
+    h.insert(
+        axum::http::header::CONTENT_TYPE, // HeaderName::from_static("Content-type:"),
+        HeaderValue::from_static("image/svg+xml"),
+    );
+    (h, svg.clone().into_bytes())
 }
 
 #[derive(Debug, Deserialize)]
