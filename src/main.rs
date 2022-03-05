@@ -13,6 +13,7 @@ mod svgbuilder;
 
 #[tokio::main]
 async fn main() {
+    println!("CTRL + c to quit.");
     axum::Server::bind(&"0.0.0.0:7582".parse().unwrap())
         .serve(app().into_make_service())
         .await
