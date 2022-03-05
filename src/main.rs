@@ -7,6 +7,10 @@ use axum::{
 use serde::{de, Deserialize, Deserializer};
 use std::{fmt, str::FromStr};
 
+mod sfen;
+mod svg2png;
+mod svgbuilder;
+
 #[tokio::main]
 async fn main() {
     axum::Server::bind(&"0.0.0.0:7582".parse().unwrap())
