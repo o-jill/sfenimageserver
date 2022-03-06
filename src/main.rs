@@ -63,7 +63,13 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             sfen::LastMove::new()
         };
         result = sfen
-            .to_svg(lm.topos(), params.turn, params.sname, params.gname, params.title)
+            .to_svg(
+                lm.topos(),
+                params.turn,
+                params.sname,
+                params.gname,
+                params.title,
+            )
             .unwrap()
             .to_string();
     }

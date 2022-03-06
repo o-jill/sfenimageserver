@@ -1035,6 +1035,54 @@ impl Sfen {
                 mark.newattrib(nm, val);
             }
             gt.addchild(mark);
+        } else if teban == "d" {
+            let rectatb = [
+                // ("x", "0"),
+                // ("y", "0"),
+                ("width", "30"),
+                ("height", "5"),
+                ("fill", "#F3C"),
+                ("stroke", "none"),
+            ];
+            let mut gs = Tag::new("g");
+            gs.newattrib("id", "drawsente");
+            gs.newattrib("transform", "translate(30,20)");
+            let mut mark = Tag::new("rect");
+            for (nm, val) in rectatb {
+                mark.newattrib(nm, val);
+            }
+            mark.newattrib("x", "30");
+            mark.newattrib("y", "7");
+            gs.addchild(mark);
+
+            let mut mark = Tag::new("rect");
+            for (nm, val) in rectatb {
+                mark.newattrib(nm, val);
+            }
+            mark.newattrib("x", "30");
+            mark.newattrib("y", "18");
+            gs.addchild(mark);
+            gt.addchild(gs);
+
+            let mut gg = Tag::new("g");
+            gg.newattrib("id", "drawgote");
+            gg.newattrib("transform", "translate(0,245)");
+            let mut mark = Tag::new("rect");
+            for (nm, val) in rectatb {
+                mark.newattrib(nm, val);
+            }
+            mark.newattrib("x", "30");
+            mark.newattrib("y", "7");
+            gg.addchild(mark);
+
+            let mut mark = Tag::new("rect");
+            for (nm, val) in rectatb {
+                mark.newattrib(nm, val);
+            }
+            mark.newattrib("x", "30");
+            mark.newattrib("y", "18");
+            gg.addchild(mark);
+            gt.addchild(gg);
         } else {
             return None;
         }
