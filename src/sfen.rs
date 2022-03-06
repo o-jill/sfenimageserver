@@ -876,7 +876,7 @@ impl Sfen {
         }
     }
 
-    fn build_sentename(&self, name: String) -> Tag {
+    fn build_sentename(&self, name: Option<String>) -> Tag {
         let mut gs = Tag::new("g");
         gs.newattrib("id", "sname");
         gs.newattrib("transform", "translate(5,250)");
@@ -895,7 +895,11 @@ impl Sfen {
         gp.addchild(pl);
         gs.addchild(gp);
 
-        if name.is_empty() {
+        if name.is_none() {
+            return gs;
+        }
+        let nm = name.unwrap();
+        if nm.is_empty() {
             return gs;
         }
 
@@ -911,12 +915,12 @@ impl Sfen {
         for (nm, val) in atr {
             txt.newattrib(nm, val);
         }
-        txt.value = name;
+        txt.value = nm;
         gs.addchild(txt);
         gs
     }
 
-    fn build_gotename(&self, name: String) -> Tag {
+    fn build_gotename(&self, name: Option<String>) -> Tag {
         let mut gg = Tag::new("g");
         gg.newattrib("id", "gname");
         gg.newattrib("transform", "translate(5,25)");
@@ -932,7 +936,11 @@ impl Sfen {
         }
         gg.addchild(pl);
 
-        if name.is_empty() {
+        if name.is_none() {
+            return gg;
+        }
+        let nm = name.unwrap();
+        if nm.is_empty() {
             return gg;
         }
 
@@ -948,13 +956,17 @@ impl Sfen {
         for (nm, val) in atr {
             txt.newattrib(nm, val);
         }
-        txt.value = name;
+        txt.value = nm;
         gg.addchild(txt);
         gg
     }
 
-    fn build_title(&self, title: String) -> Option<Tag> {
-        if title.is_empty() {
+    fn build_title(&self, title: Option<String>) -> Option<Tag> {
+        if title.is_none() {
+            return None;
+        }
+        let ttl = title.unwrap();
+        if ttl.is_empty() {
             return None;
         }
         let mut gt = Tag::new("g");
@@ -972,7 +984,7 @@ impl Sfen {
         for (nm, val) in atr {
             txt.newattrib(nm, val);
         }
-        txt.value = title;
+        txt.value = ttl;
         gt.addchild(txt);
         Some(gt)
     }
@@ -1032,9 +1044,9 @@ impl Sfen {
     pub fn to_svg(
         &self,
         lastmove: Option<(usize, usize)>,
-        sname: String,
-        gname: String,
-        title: String,
+        sname: Option<String>,
+        gname: Option<String>,
+        title: Option<String>,
     ) -> Result<SVG, String> {
         let mut top = Tag::new("g");
         let ttl = self.build_title(title);

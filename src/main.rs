@@ -25,22 +25,35 @@ fn app() -> Router {
 }
 
 async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
-    let svg = format!("<?xml version='1.0'?>\n\
-    <svg width='300' height='100' viewBox='0 0 300 100' version='1.1' xmlns='http://www.w3.org/2000/svg' >\n\
-    <style>\n\
-    /* <![CDATA[ */\n\
-    text {{font-size: 10px;}}\n\
-    /* ]]> */\n\
-    </style>\n\
-    <g><text x=\"30\" y=\"30\" value=\"aaaaaaaaaa\">{:?}</text></g>\n\
-    </svg>\n", params);
-
+    let result: String;
+    if params.sfen.is_none() {
+        result = format!("<?xml version='1.0'?>\n\
+            <svg width='300' height='100' viewBox='0 0 300 100' version='1.1' xmlns='http://www.w3.org/2000/svg' >\n\
+            <style>\n\
+            /* <![CDATA[ */\n\
+            text {{font-size: 10px;}}\n\
+            /* ]]> */\n\
+            </style>\n\
+            <g><text x=\"30\" y=\"30\" value=\"aaaaaaaaaa\">{:?}</text></g>\n\
+            </svg>\n", params);
+    } else {
+        let sfen = sfen::Sfen::new(&params.sfen.unwrap());
+        let lm = if params.lm.is_some() {
+            sfen::LastMove::read(&params.lm.unwrap()).unwrap_or(sfen::LastMove::new())
+        } else {
+            sfen::LastMove::new()
+        };
+        result = sfen
+            .to_svg(lm.topos(), params.sname, params.gname, params.title)
+            .unwrap()
+            .to_string();
+    }
     let mut h = HeaderMap::new();
     h.insert(
         axum::http::header::CONTENT_TYPE, // HeaderName::from_static("Content-type:"),
         HeaderValue::from_static("image/svg+xml"),
     );
-    (h, svg.clone().into_bytes())
+    (h, result.clone().into_bytes())
 }
 
 #[derive(Debug, Deserialize)]
