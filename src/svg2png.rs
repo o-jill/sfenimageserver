@@ -13,13 +13,20 @@ pub fn start_rsvg(svg: String) -> Result<Vec<u8>, String> {
         Ok(prcs) => prcs,
     };
 
-    match cmd.stdin.take().unwrap().write_all(&svg.as_bytes()) {
-        Ok(_) => {
-            let w = cmd.wait_with_output().unwrap();
-            // println!("{} bytes.", w.stdout.len());
-            Ok(w.stdout)
+    match cmd.stdin.as_mut() {
+        None => {
+            return Err(String::from("child_stdin is None."));
         }
-        Err(msg) => Err(format!("error running png converter... [{}]", msg)),
+        Some(child_stdin) => {
+            match child_stdin.write_all(&svg.as_bytes()) {
+                Ok(_) => {
+                    let w = cmd.wait_with_output().unwrap();
+                    // println!("{} bytes.", w.stdout.len());
+                    Ok(w.stdout)
+                }
+                Err(msg) => Err(format!("error running png converter... [{}]", msg)),
+            }
+        }
     }
 }
 
