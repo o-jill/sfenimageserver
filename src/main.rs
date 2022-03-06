@@ -63,27 +63,47 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
         } else {
             sfen::LastMove::new()
         };
-        result = sfen
-            .to_svg(
-                lm.topos(),
-                params.turn,
-                params.sname,
-                params.gname,
-                params.title,
-            )
-            .unwrap()
-            .to_string();
+        match sfen.to_svg(
+            lm.topos(),
+            params.turn,
+            params.sname,
+            params.gname,
+            params.title,
+        ) {
+            Ok(svg) => result = svg.to_string(),
+            Err(msg) => {
+                eprintln!("error: {}", msg);
+                let mut h = HeaderMap::new();
+                h.insert(
+                    axum::http::header::CONTENT_TYPE,
+                    HeaderValue::from_static("text/plain"),
+                );
+                return (h, msg.into_bytes());
+            }
+        }
     }
 
     let image = params.image.unwrap_or(String::from("svg"));
     if image == "png" {
-        let png = svg2png::start_rsvg(result.to_string());
-        let mut h = HeaderMap::new();
-        h.insert(
-            axum::http::header::CONTENT_TYPE,
-            HeaderValue::from_static("image/png"),
-        );
-        (h, png.unwrap())
+        match svg2png::start_rsvg(result.to_string()) {
+            Ok(png) => {
+                let mut h = HeaderMap::new();
+                h.insert(
+                    axum::http::header::CONTENT_TYPE,
+                    HeaderValue::from_static("image/png"),
+                );
+                (h, png)
+            }
+            Err(msg) => {
+                eprintln!("error: {}", msg);
+                let mut h = HeaderMap::new();
+                h.insert(
+                    axum::http::header::CONTENT_TYPE,
+                    HeaderValue::from_static("text/plain"),
+                );
+                (h, msg.into_bytes())
+            }
+        }
     } else {
         let mut h = HeaderMap::new();
         h.insert(
