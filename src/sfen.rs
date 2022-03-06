@@ -989,7 +989,7 @@ impl Sfen {
         Some(gt)
     }
 
-    fn build_teban(&self) -> Option<Tag> {
+    fn build_teban(&self, teban: String) -> Option<Tag> {
         let mut gt = Tag::new("g");
         gt.newattrib("id", "teban");
 
@@ -1006,7 +1006,7 @@ impl Sfen {
             ("fill", "#F3C"),
             ("stroke", "none"),
         ];
-        if self.teban == "w" {
+        if teban == "w" {
             gt.newattrib("transform", "translate(0,20)");
 
             let mut mark = Tag::new("rect");
@@ -1014,23 +1014,23 @@ impl Sfen {
                 mark.newattrib(nm, val);
             }
             gt.addchild(mark);
-        } else if self.teban == "b" {
+        } else if teban == "b" {
             gt.newattrib("transform", "translate(230,245)");
             let mut mark = Tag::new("rect");
             for (nm, val) in rectatb {
                 mark.newattrib(nm, val);
             }
             gt.addchild(mark);
-        } else if self.teban == "fw" {
+        } else if teban == "fw" {
             gt.newattrib("transform", "translate(30,20)");
-            let mut mark = Tag::new("rect");
+            let mut mark = Tag::new("polygon");
             for (nm, val) in polyatb {
                 mark.newattrib(nm, val);
             }
             gt.addchild(mark);
-        } else if self.teban == "fb" {
+        } else if teban == "fb" {
             gt.newattrib("transform", "translate(0,245)");
-            let mut mark = Tag::new("rect");
+            let mut mark = Tag::new("polygon");
             for (nm, val) in polyatb {
                 mark.newattrib(nm, val);
             }
@@ -1044,6 +1044,7 @@ impl Sfen {
     pub fn to_svg(
         &self,
         lastmove: Option<(usize, usize)>,
+        turn: Option<String>,
         sname: Option<String>,
         gname: Option<String>,
         title: Option<String>,
@@ -1053,9 +1054,11 @@ impl Sfen {
         if ttl.is_some() {
             top.addchild(ttl.unwrap());
         }
-        let tbn = self.build_teban();
-        if tbn.is_some() {
-            top.addchild(tbn.unwrap());
+        if turn.is_some() {
+            let tbn = self.build_teban(turn.unwrap());
+            if tbn.is_some() {
+                top.addchild(tbn.unwrap());
+            }
         }
         top.addchild(self.build_sentename(sname));
         top.addchild(self.build_gotename(gname));

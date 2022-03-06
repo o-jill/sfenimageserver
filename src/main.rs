@@ -63,7 +63,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             sfen::LastMove::new()
         };
         result = sfen
-            .to_svg(lm.topos(), params.sname, params.gname, params.title)
+            .to_svg(lm.topos(), params.turn, params.sname, params.gname, params.title)
             .unwrap()
             .to_string();
     }
@@ -83,7 +83,8 @@ struct Params {
     gname: Option<String>,
     title: Option<String>,
     lm: Option<String>,
-    r#type: Option<String>,
+    turn: Option<String>,
+    image: Option<String>,
 }
 
 fn empty_string_as_none<'de, D, T>(de: D) -> Result<Option<T>, D::Error>
