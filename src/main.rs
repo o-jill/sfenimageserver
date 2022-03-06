@@ -75,12 +75,24 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             .unwrap()
             .to_string();
     }
-    let mut h = HeaderMap::new();
-    h.insert(
-        axum::http::header::CONTENT_TYPE, // HeaderName::from_static("Content-type:"),
-        HeaderValue::from_static("image/svg+xml"),
-    );
-    (h, result.clone().into_bytes())
+
+    let image = params.image.unwrap_or(String::from("svg"));
+    if image == "png" {
+        let png = svg2png::start_rsvg(result.to_string());
+        let mut h = HeaderMap::new();
+        h.insert(
+            axum::http::header::CONTENT_TYPE,
+            HeaderValue::from_static("image/png"),
+        );
+        (h, png.unwrap())
+    } else {
+        let mut h = HeaderMap::new();
+        h.insert(
+            axum::http::header::CONTENT_TYPE,
+            HeaderValue::from_static("image/svg+xml"),
+        );
+        (h, result.clone().into_bytes())
+    }
 }
 
 #[derive(Debug, Deserialize)]
