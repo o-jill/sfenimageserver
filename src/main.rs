@@ -47,16 +47,15 @@ async fn help() -> axum::response::Html<&'static str> {
 
 async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     let result: String;
+
     if params.sfen.is_none() {
-        result = format!("<?xml version='1.0'?>\n\
-            <svg width='300' height='100' viewBox='0 0 300 100' version='1.1' xmlns='http://www.w3.org/2000/svg' >\n\
-            <style>\n\
-            /* <![CDATA[ */\n\
-            text {{font-size: 10px;}}\n\
-            /* ]]> */\n\
-            </style>\n\
-            <g><text x=\"30\" y=\"30\" value=\"aaaaaaaaaa\">{:?}</text></g>\n\
-            </svg>\n", params);
+        let msg = "sfen is not specified...";
+        let mut h = HeaderMap::new();
+        h.insert(
+            axum::http::header::CONTENT_TYPE,
+            HeaderValue::from_static("text/plain"),
+        );
+        return (h, msg.into());
     } else {
         let sfen = sfen::Sfen::new(&params.sfen.unwrap());
         let lm = if params.lm.is_some() {
