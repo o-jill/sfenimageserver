@@ -33,12 +33,14 @@ async fn help() -> axum::response::Html<&'static str> {
         <h2>options</h2>\
         <ul><li>sfen<br>sfen text. this must be given.<br>\
         ex. \"lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1\"\
-        <li>sname<br>sente's name.
-        <li>gname<br>gote's name.
-        <li>title<br>title.
-        <li>turn<br>turn. b, w, fb, fw or d.
-        <li>image<br>svg or png.
-        </ul>
+        <li>sname<br>sente's name.\
+        <li>gname<br>gote's name.\
+        <li>title<br>title.\
+        <li>turn<br>turn. b, w, fb, fw or d.\
+        <li>image<br>svg or png.\
+        </ul>\
+        <h2>example:</h2>\
+        http://localhost:7582/?sfen=lnsg3nl%2F1k3s1r1%2Fppppppgpp%2F6p2%2F7P1%2F2P2PP2%2FPPBPP1N1P%2F3K2SR1%2FLNSG1G2L+w+b+20&lm=37&sname=o-jill&gname=%E3%81%A2%E3%82%8B&title=2022%2F03%2F04+12%3A46%3A30&turn=d&image=svg
         </body></html>",
     )
 }
