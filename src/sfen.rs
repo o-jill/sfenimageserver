@@ -1361,3 +1361,105 @@ impl LastMove {
         Ok(ret + "まで")
     }
 }
+
+#[test]
+fn lastmovetest() {
+    let lm = LastMove::new();
+    assert_eq!(lm.from, (0, 0));
+    assert_eq!(lm.to, (0, 0));
+    assert_eq!(lm.topos(), None);
+    assert_eq!(lm.koma.koma, KomaType::Aki);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(!lm.is_ok());
+    assert!(lm.is_from_komadai());
+    assert!(lm.to_string().unwrap().is_empty());
+
+    let lm = LastMove::read("7776FU").unwrap();
+    assert_eq!(lm.from, (7, 7));
+    assert_eq!(lm.to, (7, 6));
+    assert_eq!(lm.topos(), Some((7, 6)));
+    assert_eq!(lm.koma.koma, KomaType::Fu);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("７六歩まで"));
+
+    let lm = LastMove::read("3334FU").unwrap();
+    assert_eq!(lm.from, (3, 3));
+    assert_eq!(lm.to, (3, 4));
+    assert_eq!(lm.topos(), Some((3, 4)));
+    assert_eq!(lm.koma.koma, KomaType::Fu);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("３四歩まで"));
+
+    let lm = LastMove::read("8822KAP").unwrap();
+    assert_eq!(lm.from, (8, 8));
+    assert_eq!(lm.to, (2, 2));
+    assert_eq!(lm.topos(), Some((2, 2)));
+    assert_eq!(lm.koma.koma, KomaType::Kaku);
+    assert_eq!(lm.promote, Promotion::Promoted);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("２二角成まで"));
+
+    let lm = LastMove::read("8222HI").unwrap();
+    assert_eq!(lm.from, (8, 2));
+    assert_eq!(lm.to, (2, 2));
+    assert_eq!(lm.topos(), Some((2, 2)));
+    assert_eq!(lm.koma.koma, KomaType::Hisha);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("２二飛まで"));
+
+    let lm = LastMove::read("0088KA").unwrap();
+    assert_eq!(lm.from, (0, 0));
+    assert_eq!(lm.to, (8, 8));
+    assert_eq!(lm.topos(), Some((8, 8)));
+    assert_eq!(lm.koma.koma, KomaType::Kaku);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("８八角打まで"));
+
+    let lm = LastMove::read("2133KE").unwrap();
+    assert_eq!(lm.from, (2, 1));
+    assert_eq!(lm.to, (3, 3));
+    assert_eq!(lm.topos(), Some((3, 3)));
+    assert_eq!(lm.koma.koma, KomaType::Keima);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("３三桂まで"));
+
+    let lm = LastMove::read("6958KIR").unwrap();
+    assert_eq!(lm.from, (6, 9));
+    assert_eq!(lm.to, (5, 8));
+    assert_eq!(lm.topos(), Some((5, 8)));
+    assert_eq!(lm.koma.koma, KomaType::Kin);
+    assert_eq!(lm.promote, Promotion::None);
+    assert_eq!(lm.dir, String::from("R"));
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("５八金右まで"));
+
+    let lm = LastMove::read("2212HI").unwrap();
+    assert_eq!(lm.from, (2, 2));
+    assert_eq!(lm.to, (1, 2));
+    assert_eq!(lm.topos(), Some((1, 2)));
+    assert_eq!(lm.koma.koma, KomaType::Hisha);
+    assert_eq!(lm.promote, Promotion::None);
+    assert!(lm.dir.is_empty());
+    assert!(lm.is_ok());
+    assert!(!lm.is_from_komadai());
+    assert_eq!(lm.to_string().unwrap(), String::from("１二飛まで"));
+}
