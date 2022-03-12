@@ -1,20 +1,51 @@
+// #[macro_use]
+// extern crate log;
+// extern crate simplelog;
+
 use axum::{
     extract::Query,
     http::header::{HeaderMap, HeaderValue},
     routing::get,
     Router,
 };
+use log::*;
 use serde::{de, Deserialize, Deserializer};
-use std::{fmt, str::FromStr};
+use simplelog::*;
+use std::{fmt, fs::File, str::FromStr};
 
 mod myoptions;
 mod sfen;
 mod svg2png;
 mod svgbuilder;
 
+fn initlog() {
+    CombinedLogger::init(vec![
+        TermLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            TerminalMode::Mixed,
+            ColorChoice::Auto,
+        ),
+        WriteLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            File::create("logfile.txt").unwrap(),
+        ),
+    ])
+    .unwrap();
+
+    // debug!("start logging debug.");
+    // info!("start logging info:");
+    // warn!("warning! warning! warning!");
+    // error!("some error happend!!");
+}
+
 #[tokio::main]
 async fn main() {
     let mo = myoptions::MyOptions::new(std::env::args().collect());
+
+    initlog();
+
     eprintln!("CTRL + c to quit.");
     let portstr = format!("0.0.0.0:{}", mo.port);
     println!("Listening to \"{}\" ...", portstr);
