@@ -18,20 +18,29 @@ mod sfen;
 mod svg2png;
 mod svgbuilder;
 
-fn initlog() {
-    CombinedLogger::init(vec![
-        TermLogger::new(
+fn initlog(logpath: String) {
+    CombinedLogger::init(if logpath.is_empty() {
+        vec![TermLogger::new(
             LevelFilter::Info,
             Config::default(),
             TerminalMode::Mixed,
             ColorChoice::Auto,
-        ),
-        WriteLogger::new(
-            LevelFilter::Info,
-            Config::default(),
-            File::create("logfile.txt").unwrap(),
-        ),
-    ])
+        )]
+    } else {
+        vec![
+            TermLogger::new(
+                LevelFilter::Info,
+                Config::default(),
+                TerminalMode::Mixed,
+                ColorChoice::Auto,
+            ),
+            WriteLogger::new(
+                LevelFilter::Info,
+                Config::default(),
+                File::create(logpath).unwrap(),
+            ),
+        ]
+    })
     .unwrap();
 
     // debug!("start logging debug.");
@@ -44,11 +53,11 @@ fn initlog() {
 async fn main() {
     let mo = myoptions::MyOptions::new(std::env::args().collect());
 
-    initlog();
+    initlog(mo.logpath);
 
-    eprintln!("CTRL + c to quit.");
+    info!("CTRL + c to quit.");
     let portstr = format!("0.0.0.0:{}", mo.port);
-    println!("Listening to \"{}\" ...", portstr);
+    info!("Listening to \"{}\" ...", portstr);
     axum::Server::bind(&portstr.parse().unwrap())
         .serve(app().into_make_service())
         .await
@@ -62,6 +71,7 @@ fn app() -> Router {
 }
 
 async fn help() -> axum::response::Html<&'static str> {
+    info!("call help()");
     axum::response::Html(
         "<html><head><title>help - sfenimageserver -</title></head>\
         <body><h1>sfenimageserver<h1>\
@@ -82,7 +92,7 @@ async fn help() -> axum::response::Html<&'static str> {
 
 async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     let result: String;
-
+    info!("call handler() : {:?}", params);
     if params.sfen.is_none() {
         let msg = "sfen is not specified...";
         let mut h = HeaderMap::new();
