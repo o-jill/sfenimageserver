@@ -11,5 +11,8 @@ rsvg-convert (and inkscape) are supported to generate png.
 * --port \<port number\>  
   configure port number. default: 7582.  
   ex. ./sfenimageserver --port 12345  
+* --log \<log path\>  
+  configure log path. default: no log file.  
+  ex. ./sfenimageserver -- log /var/log/to/my/log.txt  
 
 ---
