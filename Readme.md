@@ -2,8 +2,14 @@
 [![issues](https://img.shields.io/github/issues/o-jill/sfenimageserver.svg)](https://github.com/o-jill/sfenimageserver/issues/)
 [![Rust](https://github.com/o-jill/sfenimageserver/actions/workflows/rust.yml/badge.svg)](https://github.com/o-jill/sfenimageserver/actions/workflows/rust.yml)
 
-sfenimageserver is a web server which serves svg and png from sfen.  
+# sfenimageserver  
+is a web server which serves svg and png from sfen.  
 
 rsvg-convert (and inkscape) are supported to generate png.
+
+# options:  
+* --port \<portnumber\>  
+  configure port number. default: 7582.  
+  ex. ./sfenimageserver --port 12345  
 
 ---
