@@ -8,7 +8,7 @@ is a web server which serves svg and png from sfen.
 rsvg-convert (and inkscape) are supported to generate png.
 
 # options:  
-* --port \<portnumber\>  
+* --port \<port number\>  
   configure port number. default: 7582.  
   ex. ./sfenimageserver --port 12345  
 
