@@ -21,7 +21,9 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Usecase test
-      run: ./test/usecase.sh
+      run: |
+        sudo apt install librsvg2-bin
+        ./test/usecase.sh
     - name: save log
       uses: actions/upload-artifact@v2
       with:
