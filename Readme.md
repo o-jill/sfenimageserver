@@ -14,5 +14,9 @@ rsvg-convert (and inkscape) are supported to generate png.
 * --log \<log path\>  
   configure log path. default: no log file.  
   ex. ./sfenimageserver -- log /var/log/to/my/log.txt  
+* --rsvg  
+  use rsvg-convert. selected by default.  
+* --inkscape11  
+  use inkscape ver.1.1.  
 
 ---
