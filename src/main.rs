@@ -156,7 +156,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
                 (h, msg.into_bytes())
             }
         }
-    } else if image == "png" {
+    } else if image == "svg" {
         let mut h = HeaderMap::new();
         h.insert(
             axum::http::header::CONTENT_TYPE,
