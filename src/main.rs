@@ -100,11 +100,18 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             axum::http::header::CONTENT_TYPE,
             HeaderValue::from_static("text/plain"),
         );
+        warn!("{}", msg);
         return (h, msg.into());
     } else {
         let sfen = sfen::Sfen::new(&params.sfen.unwrap());
         let lm = if params.lm.is_some() {
-            sfen::LastMove::read(&params.lm.unwrap()).unwrap_or(sfen::LastMove::new())
+            match sfen::LastMove::read(&params.lm.unwrap()) {
+                Ok(ret) => ret,
+                Err(msg) => {
+                    warn!("{}", msg);
+                    sfen::LastMove::new()
+                }
+            }
         } else {
             sfen::LastMove::new()
         };
@@ -117,7 +124,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
         ) {
             Ok(svg) => result = svg.to_string(),
             Err(msg) => {
-                eprintln!("error: {}", msg);
+                warn!("{}", msg);
                 let mut h = HeaderMap::new();
                 h.insert(
                     axum::http::header::CONTENT_TYPE,
@@ -140,7 +147,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
                 (h, png)
             }
             Err(msg) => {
-                eprintln!("error: {}", msg);
+                warn!("{}", msg);
                 let mut h = HeaderMap::new();
                 h.insert(
                     axum::http::header::CONTENT_TYPE,
@@ -149,13 +156,22 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
                 (h, msg.into_bytes())
             }
         }
-    } else {
+    } else if image == "png" {
         let mut h = HeaderMap::new();
         h.insert(
             axum::http::header::CONTENT_TYPE,
             HeaderValue::from_static("image/svg+xml"),
         );
         (h, result.clone().into_bytes())
+    } else {
+        let msg = "invalid image type.";
+        let mut h = HeaderMap::new();
+        h.insert(
+            axum::http::header::CONTENT_TYPE,
+            HeaderValue::from_static("text/plain"),
+        );
+        warn!("{}", msg);
+        return (h, msg.into());
     }
 }
 
