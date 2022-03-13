@@ -164,7 +164,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
         );
         (h, result.clone().into_bytes())
     } else {
-        let msg = "invalid image type.";
+        let msg = format!("invalid image type. \"{}\"", image);
         let mut h = HeaderMap::new();
         h.insert(
             axum::http::header::CONTENT_TYPE,
