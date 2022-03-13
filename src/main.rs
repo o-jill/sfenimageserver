@@ -18,7 +18,7 @@ mod sfen;
 mod svg2png;
 mod svgbuilder;
 
-fn initlog(logpath: String) {
+fn initlog(logpath: &str) {
     CombinedLogger::init(if logpath.is_empty() {
         vec![TermLogger::new(
             LevelFilter::Info,
@@ -49,14 +49,19 @@ fn initlog(logpath: String) {
     // error!("some error happend!!");
 }
 
+static mo: once_cell::sync::OnceCell<myoptions::MyOptions> = once_cell::sync::OnceCell::new();
+
 #[tokio::main]
 async fn main() {
-    let mo = myoptions::MyOptions::new(std::env::args().collect());
+    mo.set(myoptions::MyOptions::new(std::env::args().collect()))
+        .unwrap();
+    info!("{:?}", mo.get().unwrap());
 
-    initlog(mo.logpath);
+    initlog(&mo.get().unwrap().logpath);
 
     info!("CTRL + c to quit.");
-    let portstr = format!("0.0.0.0:{}", mo.port);
+
+    let portstr = format!("0.0.0.0:{}", mo.get().unwrap().port);
     info!("Listening to \"{}\" ...", portstr);
     axum::Server::bind(&portstr.parse().unwrap())
         .serve(app().into_make_service())
@@ -137,7 +142,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
 
     let image = params.image.unwrap_or(String::from("svg"));
     if image == "png" {
-        match svg2png::start_rsvg(result.to_string()) {
+        match svg2png::start(result.to_string(), mo.get().unwrap().svg2png) {
             Ok(png) => {
                 let mut h = HeaderMap::new();
                 h.insert(

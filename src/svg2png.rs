@@ -1,5 +1,19 @@
 use std::io::Write;
 
+#[derive(Clone, Copy, Debug)]
+pub enum Type {
+    RSVG,
+    INKSCAPE11,
+}
+
+pub fn start(svg: String, typ: Type) -> Result<Vec<u8>, String> {
+    match typ {
+        Type::RSVG => start_rsvg(svg),
+        Type::INKSCAPE11 => start_inkscape(svg),
+        _ => Err(String::from("unknown converter type..")),
+    }
+}
+
 // w/ rsvg-convert version 2.50
 #[allow(dead_code)]
 pub fn start_rsvg(svg: String) -> Result<Vec<u8>, String> {
