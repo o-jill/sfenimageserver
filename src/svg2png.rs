@@ -10,7 +10,6 @@ pub fn start(svg: String, typ: Type) -> Result<Vec<u8>, String> {
     match typ {
         Type::RSVG => start_rsvg(svg),
         Type::INKSCAPE11 => start_inkscape(svg),
-        _ => Err(String::from("unknown converter type..")),
     }
 }
 

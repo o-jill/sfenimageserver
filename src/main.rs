@@ -1,7 +1,3 @@
-// #[macro_use]
-// extern crate log;
-// extern crate simplelog;
-
 use axum::{
     extract::Query,
     http::header::{HeaderMap, HeaderValue},
@@ -42,26 +38,22 @@ fn initlog(logpath: &str) {
         ]
     })
     .unwrap();
-
-    // debug!("start logging debug.");
-    // info!("start logging info:");
-    // warn!("warning! warning! warning!");
-    // error!("some error happend!!");
 }
 
-static mo: once_cell::sync::OnceCell<myoptions::MyOptions> = once_cell::sync::OnceCell::new();
+static MYOPT: once_cell::sync::OnceCell<myoptions::MyOptions> = once_cell::sync::OnceCell::new();
 
 #[tokio::main]
 async fn main() {
-    mo.set(myoptions::MyOptions::new(std::env::args().collect()))
+    MYOPT
+        .set(myoptions::MyOptions::new(std::env::args().collect()))
         .unwrap();
-    info!("{:?}", mo.get().unwrap());
+    info!("{:?}", MYOPT.get().unwrap());
 
-    initlog(&mo.get().unwrap().logpath);
+    initlog(&MYOPT.get().unwrap().logpath);
 
     info!("CTRL + c to quit.");
 
-    let portstr = format!("0.0.0.0:{}", mo.get().unwrap().port);
+    let portstr = format!("0.0.0.0:{}", MYOPT.get().unwrap().port);
     info!("Listening to \"{}\" ...", portstr);
     axum::Server::bind(&portstr.parse().unwrap())
         .serve(app().into_make_service())
@@ -95,16 +87,15 @@ async fn help() -> axum::response::Html<&'static str> {
     )
 }
 
+static TEXTPLAIN: HeaderValue = HeaderValue::from_static("text/plain");
+
 async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     let result: String;
     info!("call handler() : {:?}", params);
     if params.sfen.is_none() {
         let msg = "sfen is not specified...";
         let mut h = HeaderMap::new();
-        h.insert(
-            axum::http::header::CONTENT_TYPE,
-            HeaderValue::from_static("text/plain"),
-        );
+        h.insert(axum::http::header::CONTENT_TYPE, TEXTPLAIN.clone());
         warn!("{}", msg);
         return (h, msg.into());
     } else {
@@ -131,10 +122,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             Err(msg) => {
                 warn!("{}", msg);
                 let mut h = HeaderMap::new();
-                h.insert(
-                    axum::http::header::CONTENT_TYPE,
-                    HeaderValue::from_static("text/plain"),
-                );
+                h.insert(axum::http::header::CONTENT_TYPE, TEXTPLAIN.clone());
                 return (h, msg.into_bytes());
             }
         }
@@ -142,7 +130,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
 
     let image = params.image.unwrap_or(String::from("svg"));
     if image == "png" {
-        match svg2png::start(result.to_string(), mo.get().unwrap().svg2png) {
+        match svg2png::start(result.to_string(), MYOPT.get().unwrap().svg2png) {
             Ok(png) => {
                 let mut h = HeaderMap::new();
                 h.insert(
@@ -154,10 +142,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             Err(msg) => {
                 warn!("{}", msg);
                 let mut h = HeaderMap::new();
-                h.insert(
-                    axum::http::header::CONTENT_TYPE,
-                    HeaderValue::from_static("text/plain"),
-                );
+                h.insert(axum::http::header::CONTENT_TYPE, TEXTPLAIN.clone());
                 (h, msg.into_bytes())
             }
         }
@@ -171,10 +156,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     } else {
         let msg = format!("invalid image type. \"{}\"", image);
         let mut h = HeaderMap::new();
-        h.insert(
-            axum::http::header::CONTENT_TYPE,
-            HeaderValue::from_static("text/plain"),
-        );
+        h.insert(axum::http::header::CONTENT_TYPE, TEXTPLAIN.clone());
         warn!("{}", msg);
         return (h, msg.into());
     }
