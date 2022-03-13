@@ -22,3 +22,13 @@ jobs:
       run: cargo test --verbose
     - name: Usecase test
       run: ./test/usecase.sh
+    - name: save log
+      uses: actions/upload-artifact@v2
+      with:
+        name: usecase log
+        path: |
+          test01.svg
+          test01.png
+          help.html
+          nosfen.log
+          usecase.log

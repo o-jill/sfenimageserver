@@ -2,7 +2,7 @@
 
 cargo build --release
 
-./target/release/sfenimageserver &
+./target/release/sfenimageserver --log usecase.log &
 
 curl http://127.0.0.1:7582/ > nosfen.log
 

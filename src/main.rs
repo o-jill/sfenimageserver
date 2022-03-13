@@ -47,10 +47,10 @@ async fn main() {
     MYOPT
         .set(myoptions::MyOptions::new(std::env::args().collect()))
         .unwrap();
-    info!("{:?}", MYOPT.get().unwrap());
 
     initlog(&MYOPT.get().unwrap().logpath);
 
+    info!("myoption:{:?}", MYOPT.get().unwrap());
     info!("CTRL + c to quit.");
 
     let portstr = format!("0.0.0.0:{}", MYOPT.get().unwrap().port);
