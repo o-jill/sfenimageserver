@@ -31,7 +31,7 @@ impl MyOptions {
                     if e.parse::<u16>().is_ok() {
                         opt.port = e;
                     }
-                } else if e == "--log" {
+                } else if old == "--log" {
                     opt.logpath = e;
                 }
                 old = String::new();
