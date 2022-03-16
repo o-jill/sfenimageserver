@@ -1278,9 +1278,9 @@ impl LastMove {
             promote: sfen::Promotion::None,
             dir: String::new(),
         };
-        let re =
+        let refull =
             regex::Regex::new("(\\d\\d)(\\d\\d)([a-zA-Z][a-zA-Z])([PN]?)([LRAUHSCY]*)").unwrap();
-        match re.captures(txt) {
+        match refull.captures(txt) {
             Some(cap) => {
                 let frm: usize = cap.get(1).map_or("", |s| s.as_str()).parse().unwrap();
                 lm.from = (frm / 10, frm % 10);
@@ -1305,7 +1305,19 @@ impl LastMove {
 
                 Ok(lm)
             }
-            None => Err(format!("\"{}\" is invalid lastmove.", txt)),
+            None => {
+                let reshort = regex::Regex::new("^(\\d)(\\d)$").unwrap();
+                match reshort.captures(txt) {
+                    Some(xy) => {
+                        lm.to = (
+                            xy.get(1).map_or("", |s| s.as_str()).parse().unwrap(),
+                            xy.get(2).map_or("", |s| s.as_str()).parse().unwrap(),
+                        );
+                        Ok(lm)
+                    }
+                    None => Err(format!("\"{}\" is invalid lastmove.", txt)),
+                }
+            }
         }
     }
     pub fn is_ok(&self) -> bool {
