@@ -129,7 +129,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     }
 
     let image = params.image.unwrap_or(String::from("svg"));
-    if image == "png" {
+    if image == "png" || image == ".png" {
         match svg2png::start(result.to_string(), MYOPT.get().unwrap().svg2png) {
             Ok(png) => {
                 let mut h = HeaderMap::new();
@@ -146,7 +146,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
                 (h, msg.into_bytes())
             }
         }
-    } else if image == "svg" {
+    } else if image == "svg" || image == ".svg" {
         let mut h = HeaderMap::new();
         h.insert(
             axum::http::header::CONTENT_TYPE,
