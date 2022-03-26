@@ -132,6 +132,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     if image == "png" || image == ".png" {
         let mut opt = svg2png::Svg2PngConfig::new();
         opt.typ = MYOPT.get().unwrap().svg2png;
+        opt.bgcolor = MYOPT.get().unwrap().bgcolor.clone();
         match svg2png::start(result.to_string(), opt) {
             Ok(png) => {
                 let mut h = HeaderMap::new();
