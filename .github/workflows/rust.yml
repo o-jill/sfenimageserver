@@ -29,11 +29,4 @@ jobs:
       with:
         name: usecase log
         path: |
-          test01.svg
-          test02.svg
-          test03.svg
-          test04.svg
-          test01.png
-          help.html
-          nosfen.log
-          usecase.log
+          test
