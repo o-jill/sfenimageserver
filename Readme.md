@@ -18,5 +18,15 @@ rsvg-convert (and inkscape) are supported to generate png.
   use rsvg-convert. selected by default.  
 * --inkscape11  
   use inkscape ver.1.1.  
+* --light  
+  fgcolor:black, bgcolor:white. default.
+* --dark  
+  fgcolor:white, bgcolor:black.
+* --bgcolor \<color\>  
+  configure background color only for png. default: white.  
+  black, white, red, ... #rrggbb  
+* --fgcolor \<color\>  
+  configure foreground color. default: black.  
+  black, white, red, ... #rrggbb  
 
 ---
