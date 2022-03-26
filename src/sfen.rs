@@ -911,6 +911,7 @@ impl Sfen {
             ("text-anchor", "left"),
             ("width", "230px"),
             ("text-overflow", "ellipsis"),
+            ("fill", "black"),
         ];
         for (nm, val) in atr {
             txt.newattrib(nm, val);
@@ -952,6 +953,7 @@ impl Sfen {
             ("text-anchor", "left"),
             ("width", "230px"),
             ("text-overflow", "ellipsis"),
+            ("fill", "black"),
         ];
         for (nm, val) in atr {
             txt.newattrib(nm, val);
@@ -980,6 +982,7 @@ impl Sfen {
             ("text-anchor", "middle"),
             ("width", "260px"),
             ("text-overflow", "ellipsis"),
+            ("fill", "black"),
         ];
         for (nm, val) in atr {
             txt.newattrib(nm, val);
@@ -1143,6 +1146,7 @@ fn komatag(k: &Koma, x: i32, y: i32) -> Option<Tag> {
     let mut tag = Tag::new("text");
     tag.newattrib("font-size", "18px");
     tag.newattrib("text-anchor", "middle");
+    tag.newattrib("fill", "black");
     if k.is_sente() {
         tag.addattrib(Attrib::new("x", format!("{}", 10)));
         tag.addattrib(Attrib::new("y", format!("{}", 17)));
@@ -1222,7 +1226,12 @@ fn banborder() -> Tag {
     let mut suji = Tag::new("g");
     suji.newattrib("transform", "translate(0,-5)");
     for (i, ch) in "９８７６５４３２１".chars().enumerate() {
-        let atrs = [("y", "0"), ("font-size", "10px"), ("text-anchor", "middle")];
+        let atrs = [
+            ("y", "0"),
+            ("font-size", "10px"),
+            ("text-anchor", "middle"),
+            ("fill", "black"),
+        ];
         let mut txt = Tag::new("text");
         for (nm, val) in atrs {
             txt.newattrib(nm, val);
@@ -1237,7 +1246,12 @@ fn banborder() -> Tag {
     let mut dan = Tag::new("g");
     dan.newattrib("transform", "translate(183,0)");
     for (i, ch) in "一二三四五六七八九".chars().enumerate() {
-        let atrs = [("x", "0"), ("font-size", "10px"), ("text-anchor", "left")];
+        let atrs = [
+            ("x", "0"),
+            ("font-size", "10px"),
+            ("text-anchor", "left"),
+            ("fill", "black"),
+        ];
         let mut txt = Tag::new("text");
         for (nm, val) in atrs {
             txt.newattrib(nm, val);
