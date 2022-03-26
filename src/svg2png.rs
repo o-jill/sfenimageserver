@@ -18,6 +18,8 @@ pub fn start(svg: String, typ: Type) -> Result<Vec<u8>, String> {
 pub fn start_rsvg(svg: String) -> Result<Vec<u8>, String> {
     let mut cmd = match std::process::Command::new("rsvg-convert")
         .arg("--format=png")
+        .arg("-b")
+        .arg("white")
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .spawn()
