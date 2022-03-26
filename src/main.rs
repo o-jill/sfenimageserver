@@ -130,7 +130,9 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
 
     let image = params.image.unwrap_or(String::from("svg"));
     if image == "png" || image == ".png" {
-        match svg2png::start(result.to_string(), MYOPT.get().unwrap().svg2png) {
+        let mut opt = svg2png::Svg2PngConfig::new();
+        opt.typ = MYOPT.get().unwrap().svg2png;
+        match svg2png::start(result.to_string(), opt) {
             Ok(png) => {
                 let mut h = HeaderMap::new();
                 h.insert(

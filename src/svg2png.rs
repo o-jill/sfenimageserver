@@ -6,20 +6,34 @@ pub enum Type {
     INKSCAPE11,
 }
 
-pub fn start(svg: String, typ: Type) -> Result<Vec<u8>, String> {
-    match typ {
-        Type::RSVG => start_rsvg(svg),
-        Type::INKSCAPE11 => start_inkscape(svg),
+pub struct Svg2PngConfig {
+    pub typ: Type,
+    pub bgcolor: String,
+}
+
+impl Svg2PngConfig {
+    pub fn new() -> Svg2PngConfig {
+        Svg2PngConfig {
+            typ: Type::RSVG,
+            bgcolor: String::from("white"),
+        }
+    }
+}
+
+pub fn start(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
+    match opt.typ {
+        Type::RSVG => start_rsvg(svg, opt),
+        Type::INKSCAPE11 => start_inkscape(svg, opt),
     }
 }
 
 // w/ rsvg-convert version 2.50
 #[allow(dead_code)]
-pub fn start_rsvg(svg: String) -> Result<Vec<u8>, String> {
+pub fn start_rsvg(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     let mut cmd = match std::process::Command::new("rsvg-convert")
         .arg("--format=png")
         .arg("-b")
-        .arg("white")
+        .arg(&opt.bgcolor)
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .spawn()
@@ -47,13 +61,13 @@ pub fn start_rsvg(svg: String) -> Result<Vec<u8>, String> {
 
 // w/ inkscape version 1.1
 #[allow(dead_code)]
-pub fn start_inkscape(svg: String) -> Result<Vec<u8>, String> {
+pub fn start_inkscape(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     let mut cmd = match std::process::Command::new("inkscape")
         .arg("--pipe")
         .arg("--export-filename=-")
         .arg("--export-type=png")
         .arg("-b")
-        .arg("white")
+        .arg(&opt.bgcolor)
         .stdin(std::process::Stdio::piped())
         .stdout(std::process::Stdio::piped())
         .spawn()
