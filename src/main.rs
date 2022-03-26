@@ -127,7 +127,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
             }
         }
     }
-
+    let result = result.replace("black", &MYOPT.get().unwrap().fgcolor);
     let image = params.image.unwrap_or(String::from("svg"));
     if image == "png" || image == ".png" {
         let mut opt = svg2png::Svg2PngConfig::new();
