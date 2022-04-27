@@ -14,6 +14,9 @@ mod sfen;
 mod svg2png;
 mod svgbuilder;
 
+/// initiate log
+///
+/// - 'logpath' path for log. stdout will be used when log path is empty.
 fn initlog(logpath: &str) {
     CombinedLogger::init(if logpath.is_empty() {
         vec![TermLogger::new(
@@ -40,10 +43,12 @@ fn initlog(logpath: &str) {
     .unwrap();
 }
 
+/// global settings.
 static MYOPT: once_cell::sync::OnceCell<myoptions::MyOptions> = once_cell::sync::OnceCell::new();
 
 #[tokio::main]
 async fn main() {
+    //! entry point.
     MYOPT
         .set(myoptions::MyOptions::new(std::env::args().collect()))
         .unwrap();
@@ -61,12 +66,14 @@ async fn main() {
         .unwrap();
 }
 
+/// routing.
 fn app() -> Router {
     Router::new()
         .route("/", get(handler))
         .route("/help", get(help))
 }
 
+/// help page.
 async fn help() -> axum::response::Html<&'static str> {
     info!("call help()");
     axum::response::Html(
@@ -87,8 +94,10 @@ async fn help() -> axum::response::Html<&'static str> {
     )
 }
 
+/// HeaderValue for text/plain.
 static TEXTPLAIN: HeaderValue = HeaderValue::from_static("text/plain");
 
+/// process url.
 async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     let result: String;
     info!("call handler() : {:?}", params);
@@ -165,6 +174,7 @@ async fn handler(Query(params): Query<Params>) -> (HeaderMap, Vec<u8>) {
     }
 }
 
+/// query string parameters.
 #[derive(Debug, Deserialize)]
 struct Params {
     #[serde(default, deserialize_with = "empty_string_as_none")]
@@ -177,6 +187,7 @@ struct Params {
     image: Option<String>,
 }
 
+/// deserialize querystring to struct Params.
 fn empty_string_as_none<'de, D, T>(de: D) -> Result<Option<T>, D::Error>
 where
     D: Deserializer<'de>,
