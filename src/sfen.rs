@@ -578,18 +578,28 @@ fn komatest() {
     assert_eq!(k.to_kstring().unwrap(), "玉");
 }
 
+/// pieces in hands.
 pub struct Tegoma {
+    /// type of the piece.
     koma: KomaType,
+    /// number of the pieces.
     num: usize,
 }
 
 impl Tegoma {
+    /// Returns `Tegoma`.
+    ///
+    /// # Arguments
+    /// * `p` - a letter in sfen expression.
+    /// * 'n' - number of the pieces.
     pub fn new(p: char, n: usize) -> Tegoma {
         Tegoma {
             koma: KomaType::from(p),
             num: n,
         }
     }
+
+    /// Returns kanji expression or an error message.
     pub fn to_kanji(&self) -> Result<String, String> {
         let kanji = self.koma.to_string(Promotion::None);
         let kanjinum = [
@@ -627,6 +637,13 @@ fn testegoma() {
     }
 }
 
+/// read text for a dan(row).
+///
+/// # Argument
+/// * `txt` - text for a dan in sfen format.
+///
+/// # Return value
+/// a list(vector) of `Koma` or error message.
 fn extractdan(txt: &str) -> Result<Vec<Koma>, String> {
     let mut res = Vec::<Koma>::new();
     let masu = txt.chars();
