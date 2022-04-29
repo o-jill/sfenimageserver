@@ -2,20 +2,30 @@ use super::*;
 use regex::Regex;
 use svgbuilder::*;
 
+/// parts in sfen expression.
 pub struct Sfen {
+    /// ban status.
     ban: String,
+    /// which turn it is. b or w.
     teban: String,
+    /// pieces in players' hands.
     tegoma: String,
+    /// number of nth move.
     nteme: i32,
 }
 
+/// which turn it is.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Teban {
+    /// black.
     Sente,
+    /// white.
     Gote,
+    /// no teban expression.
     None,
 }
 
+/// types of pieces.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum KomaType {
     Aki,
@@ -30,6 +40,13 @@ pub enum KomaType {
 }
 
 impl KomaType {
+    /// Returns piece expression.
+    ///
+    /// # Arguments
+    /// * `promote` - wheather the koma is promoted or not.
+    ///
+    /// # Return value
+    /// koma expression in japanese. ex. "歩"
     pub fn to_string(&self, promote: Promotion) -> String {
         let idx = [
             KomaType::Fu,
@@ -58,6 +75,10 @@ impl KomaType {
         }
     }
 
+    /// Returns Komatype from a letter.
+    ///
+    /// # Argument
+    /// * `ch` - a letter in sfen expression. one of "PLNSGBRKplnsgbrk".
     pub fn from(ch: char) -> KomaType {
         let idx = "PLNSGBRK"
             .chars()
@@ -149,6 +170,7 @@ fn tostrtest() {
     assert_eq!(k.to_string(Promotion::Promoted), "玉");
 }
 
+/// state of promotion
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Promotion {
     None,
@@ -157,12 +179,15 @@ pub enum Promotion {
 }
 
 impl Promotion {
+    /// Returns true if it is `Promoted`.
     pub fn is_promoted(&self) -> bool {
         *self == Promotion::Promoted
     }
+    /// Returns true if it is `NotPromoted`.
     pub fn is_notpromoted(&self) -> bool {
         *self == Promotion::NotPromoted
     }
+    /// Returns `String` about promotion in a move.
     pub fn to_string(&self) -> String {
         match self {
             Promotion::Promoted => String::from("成"),
@@ -188,14 +213,23 @@ fn promotest() {
     assert_eq!(prm.to_string(), "不成");
 }
 
+/// Piece
 #[derive(Clone, Debug)]
 pub struct Koma {
+    /// type of a piece.
     koma: KomaType,
+    /// promoted or not.
     promotion: Promotion,
+    /// black or white.
     teban: Teban,
 }
 
 impl Koma {
+    /// Returns `Koma`.
+    ///
+    /// # Arguments
+    /// * `ch` - piece type in sfen expression.
+    /// * `promoted` - if the piece is promoted or not.
     pub fn from(ch: char, promote: Promotion) -> Koma {
         let re = regex::Regex::new("[PLNSGBRK]").unwrap();
         Koma {
@@ -213,6 +247,12 @@ impl Koma {
         }
     }
 
+    /// Returns `Koma` from CSA expression.
+    ///
+    /// # Argument
+    /// * `csa` - 2 letters in CSA format.
+    ///           FU, KY, KE, GI, KI, KA, HI, OU, TO, NY, NE, NG, UM, RY.
+    ///           GY is same as OU here.
     pub fn fromcsa(csa: &str) -> Option<Koma> {
         let tbl = [
             ("FU", 'P', Promotion::None),
@@ -238,6 +278,8 @@ impl Koma {
         }
     }
 
+    /// Returns expression w/ text format.
+    /// blank cell will be " ・".
     pub fn to_string(&self) -> String {
         if self.teban == Teban::None || self.koma == KomaType::Aki {
             return String::from(" ・");
@@ -247,6 +289,7 @@ impl Koma {
             + &self.koma.to_string(self.promotion)
     }
 
+    /// Returns one letter japanese expression, like "龍".
     pub fn to_kstring(&self) -> Option<String> {
         if self.teban == Teban::None || self.koma == KomaType::Aki {
             return None;
@@ -254,13 +297,17 @@ impl Koma {
         Some(self.koma.to_string(self.promotion))
     }
 
+    /// Returns true when it is blank(`KomaType::Aki`).
     pub fn is_blank(&self) -> bool {
         self.koma == KomaType::Aki
     }
 
+    /// Returns true when it is black(`Teban::Sente`).
     pub fn is_sente(&self) -> bool {
         self.teban == Teban::Sente
     }
+
+    /// Returns true when it is white(`Teban::Gote`).
     pub fn is_gote(&self) -> bool {
         self.teban == Teban::Gote
     }
