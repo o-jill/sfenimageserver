@@ -669,6 +669,10 @@ fn extractdan(txt: &str) -> Result<Vec<Koma>, String> {
 }
 
 impl Sfen {
+    /// Returns Sfen.
+    ///
+    /// # Argument
+    /// * `text` - sfen.
     pub fn new(text: &str) -> Sfen {
         let e: Vec<&str> = text.split(" ").collect();
         if e.len() < 4 {
@@ -686,6 +690,8 @@ impl Sfen {
             nteme: e[3].parse().unwrap_or(-1),
         }
     }
+
+    /// Returns teban expression in japanese or error message.
     fn tebanexp(&self) -> Result<String, String> {
         if self.teban == "b" {
             return Ok(String::from("先手の番です。"));
@@ -701,6 +707,8 @@ impl Sfen {
         }
         Err(format!("{} is invalid teban expression.", self.teban))
     }
+
+    /// Returns array of Koma on board or error message.
     pub fn extractban(&self) -> Result<Vec<Vec<Koma>>, String> {
         let mut masus: Vec<Vec<Koma>> = Vec::new();
         let vdan: Vec<&str> = self.ban.split("/").collect();
@@ -712,6 +720,8 @@ impl Sfen {
         }
         return Ok(masus);
     }
+
+    /// Returns tuple of Tegomas or error message.
     fn extracttegoma(&self) -> Result<(Vec<Tegoma>, Vec<Tegoma>), String> {
         let resente = Regex::new("[PLNSGBRK]").unwrap();
         let regote = Regex::new("[plnsgbrk]").unwrap();
@@ -737,6 +747,15 @@ impl Sfen {
         Ok((sentegoma, gotegoma))
     }
 
+    /// dump in BOD format.
+    ///
+    /// # Arguments.
+    /// * `sn` - sente's name.
+    /// * `gn` - gote's name.
+    /// * `title` - title.
+    /// * `lm` - last move.
+    /// # Return value
+    /// BOD format text.
     pub fn dump(&self, sn: &str, gn: &str, title: &str, lm: LastMove) -> String {
         let border = "+---------------------------+\n";
         let dannum = "一二三四五六七八九";
@@ -805,6 +824,13 @@ impl Sfen {
         }
     }
 
+    /// build svg tag to point out last move cell.
+    ///
+    /// # Arguments
+    /// * `suji` - column number.
+    /// * 'dan' - row number.
+    /// # Return value
+    /// SVG tag.
     fn build_lastmove(&self, suji: usize, dan: usize) -> Tag {
         let mut glm = Tag::new("g");
         glm.newattrib("id", "lastmove");
@@ -827,6 +853,12 @@ impl Sfen {
         glm
     }
 
+    /// build board svg tag.
+    ///
+    /// # Argument
+    /// * `lastmove` - cell index.
+    /// # Return value
+    /// SVG tag or error message.
     fn buildboard(&self, lastmove: Option<(usize, usize)>) -> Result<Tag, String> {
         match self.extractban() {
             Ok(ban) => {
