@@ -894,6 +894,10 @@ impl Sfen {
         }
     }
 
+    /// build svg tag about pieces in hands.
+    ///
+    /// # Return value
+    /// SVG tag or error message.
     pub fn buildtegoma(&self) -> Result<(Tag, Tag), String> {
         match self.extracttegoma() {
             Ok((sentegoma, gotegoma)) => {
@@ -972,6 +976,12 @@ impl Sfen {
         }
     }
 
+    /// build svg tag about sente's name.
+    ///
+    /// # Argument
+    /// * `name` - sente's name.
+    /// # Return value
+    /// SVG tag.
     fn build_sentename(&self, name: Option<String>) -> Tag {
         let mut gs = Tag::new("g");
         gs.newattrib("id", "sname");
@@ -1017,6 +1027,12 @@ impl Sfen {
         gs
     }
 
+    /// build svg tag about gote's name.
+    ///
+    /// # Argument
+    /// * `name` - gote's name.
+    /// # Return value
+    /// SVG tag.
     fn build_gotename(&self, name: Option<String>) -> Tag {
         let mut gg = Tag::new("g");
         gg.newattrib("id", "gname");
@@ -1059,6 +1075,12 @@ impl Sfen {
         gg
     }
 
+    /// build svg tag for title.
+    /// 
+    /// # Argument
+    /// * 'title' - title.
+    /// # Return value
+    /// SVG Tag.
     fn build_title(&self, title: Option<String>) -> Option<Tag> {
         if title.is_none() {
             return None;
@@ -1088,6 +1110,12 @@ impl Sfen {
         Some(gt)
     }
 
+    /// build svg tag to show turn.
+    /// 
+    /// # Argument
+    /// * `teban` - turn.
+    /// # Return value
+    /// SVG Tag.
     fn build_teban(&self, teban: String) -> Option<Tag> {
         let mut gt = Tag::new("g");
         gt.newattrib("id", "teban");
@@ -1188,6 +1216,16 @@ impl Sfen {
         Some(gt)
     }
 
+    /// make SVG.
+    /// 
+    /// # Argument
+    /// * `lastmove` - cell index to highlight.
+    /// * `turn` - turn.
+    /// * `sname` - sente's name.
+    /// * `gname` - gote's name.
+    /// * `title` - title.
+    /// # Return value
+    /// SVG.
     pub fn to_svg(
         &self,
         lastmove: Option<(usize, usize)>,
@@ -1228,6 +1266,14 @@ impl Sfen {
     }
 }
 
+/// make a tag for a koma at some cell.
+///
+/// # Arguments
+/// * `koma` - koma to be converted.
+/// * `x` - x coordinate. suji in other word.
+/// * `y` - x coordinate. dan in other word.
+/// # Return value
+/// SVG tag.
 fn komatag(k: &Koma, x: i32, y: i32) -> Option<Tag> {
     if k.is_blank() {
         return None;
@@ -1263,6 +1309,7 @@ fn komatag(k: &Koma, x: i32, y: i32) -> Option<Tag> {
     Some(kt)
 }
 
+/// build board borders.
 fn banborder() -> Tag {
     let mut ret = Tag::new("g");
     ret.newattrib("id", "ban");
