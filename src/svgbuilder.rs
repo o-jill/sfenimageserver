@@ -55,14 +55,20 @@ fn attribtest() {
     assert_eq!(a.to_string(), " noval");
 }
 
+/// xml tag.
 pub struct Tag {
+    /// tag name.
     name: String,
+    /// tag value.
     pub value: String,
+    /// attributes.
     attribs: Vec<Attrib>,
+    /// children tags.
     children: Vec<Tag>,
 }
 
 impl Tag {
+    /// Returns a tag.
     pub fn new(nm: &str) -> Tag {
         Tag {
             name: String::from(nm),
@@ -71,18 +77,34 @@ impl Tag {
             children: Vec::new(),
         }
     }
-
+    /// add a child.
+    ///
+    /// # Argument
+    /// * `node` - tag to be added as a child.
     pub fn addchild(&mut self, node: Tag) {
         self.children.push(node);
     }
+    /// add an attribute.
+    ///
+    /// # Argument
+    /// * `atr` - attribute to be added.
     pub fn addattrib(&mut self, atr: Attrib) {
         self.attribs.push(atr);
     }
-
+    /// add an attribute.
+    ///
+    /// # Arguments
+    /// * `nm` - attribute name.
+    /// * `val` - attribute value.
     pub fn newattrib(&mut self, nm: &str, val: &str) {
         self.addattrib(Attrib::from(nm, val));
     }
-
+    /// generate SVG image text.
+    ///
+    /// # Argument
+    /// * `indent` - indent text.
+    /// # Return value
+    /// SVG image as text.
     pub fn to_svg(&self, indent: &str) -> String {
         if self.children.len() > 0 {
             format!(
@@ -110,6 +132,7 @@ impl Tag {
             )
         }
     }
+    /// Returns all attribute text.
     pub fn attrib2string(&self) -> String {
         self.attribs
             .iter()
@@ -117,6 +140,7 @@ impl Tag {
             .collect::<Vec<String>>()
             .join("")
     }
+    /// Returns tag text of all children.
     pub fn child2string(&self, indent: &str) -> String {
         self.children
             .iter()
@@ -124,6 +148,7 @@ impl Tag {
             .collect::<Vec<String>>()
             .join("")
     }
+    /// Returns if this tag has any child.
     pub fn has_child(&self) -> bool {
         !self.children.is_empty()
     }
