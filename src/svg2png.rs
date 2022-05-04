@@ -3,7 +3,9 @@ use std::io::Write;
 /// Converter type.
 #[derive(Clone, Copy, Debug)]
 pub enum Type {
+    /// use rsvg-converter.
     RSVG,
+    /// use inkscape v1.1.
     INKSCAPE11,
 }
 
