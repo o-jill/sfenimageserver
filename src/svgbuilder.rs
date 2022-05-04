@@ -69,6 +69,9 @@ pub struct Tag {
 
 impl Tag {
     /// Returns a tag.
+    ///
+    /// # Argument
+    /// * `nm` - tag name.
     pub fn new(nm: &str) -> Tag {
         Tag {
             name: String::from(nm),
