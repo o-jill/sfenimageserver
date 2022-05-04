@@ -203,11 +203,13 @@ fn tagtest() {
     );
 }
 
+/// SVG
 pub struct SVG {
     pub tag: Tag,
 }
 
 impl SVG {
+    /// Returns SVG.
     pub fn new() -> SVG {
         let mut svg = SVG {
             tag: Tag::new("svg"),
@@ -224,6 +226,7 @@ impl SVG {
         }
         svg
     }
+    /// Returns SVG image text.
     pub fn to_string(&self) -> String {
         format!("<?xml version='1.0'?>\n{}", self.tag.to_svg(""))
     }
