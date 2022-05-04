@@ -1407,16 +1407,24 @@ fn banborder() -> Tag {
     ret
 }
 
+/// Last move
 #[derive(Debug)]
 pub struct LastMove {
+    /// cell index before move.
     pub from: (usize, usize),
+    /// cell index after move.
     pub to: (usize, usize),
+    /// koma.
     pub koma: sfen::Koma,
+    /// promoted or not.
     pub promote: sfen::Promotion,
+    /// 'R' => "右", 'L' => "左", 'A' => "上", 'U' => "上",
+    /// 'H' => "引", 'S' => "下", 'D' => "下", 'Y' => "寄", 'C' => "直",
     pub dir: String,
 }
 
 impl LastMove {
+    /// Returns LastMove.
     pub fn new() -> LastMove {
         LastMove {
             from: (0, 0),
@@ -1426,7 +1434,12 @@ impl LastMove {
             dir: String::new(),
         }
     }
-    // 7776FUPNLRAHCY
+    /// read last move style text like "7776FUPNLRAHCY".
+    /// 
+    /// # Argument
+    /// * `txt` - last move style. (from)(to)(koma)(dir).
+    /// # Return value
+    /// LastMove or error message.
     pub fn read(txt: &str) -> Result<LastMove, String> {
         let mut lm = LastMove {
             from: (0, 0),
@@ -1477,9 +1490,11 @@ impl LastMove {
             }
         }
     }
+    /// Returns if to-cell is ok or not.
     pub fn is_ok(&self) -> bool {
         self.to.0 > 0 && self.to.1 > 0
     }
+    /// Returns to-cell index.
     pub fn topos(&self) -> Option<(usize, usize)> {
         if self.is_ok() {
             Some(self.to)
@@ -1487,9 +1502,11 @@ impl LastMove {
             None
         }
     }
+    /// Returns if the move is from hand.
     pub fn is_from_komadai(&self) -> bool {
         self.from.0 == 0 && self.from.1 == 0
     }
+    /// Returns text style expression or error message.
     pub fn to_string(&self) -> Result<String, String> {
         if !self.is_ok() {
             return Ok(String::new());
