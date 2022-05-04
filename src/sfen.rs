@@ -2,20 +2,30 @@ use super::*;
 use regex::Regex;
 use svgbuilder::*;
 
+/// parts in sfen expression.
 pub struct Sfen {
+    /// ban status.
     ban: String,
+    /// which turn it is. b or w.
     teban: String,
+    /// pieces in players' hands.
     tegoma: String,
+    /// number of nth move.
     nteme: i32,
 }
 
+/// which turn it is.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Teban {
+    /// black.
     Sente,
+    /// white.
     Gote,
+    /// no teban expression.
     None,
 }
 
+/// types of pieces.
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum KomaType {
     Aki,
@@ -30,6 +40,13 @@ pub enum KomaType {
 }
 
 impl KomaType {
+    /// Returns piece expression.
+    ///
+    /// # Arguments
+    /// * `promote` - wheather the koma is promoted or not.
+    ///
+    /// # Return value
+    /// koma expression in japanese. ex. "歩"
     pub fn to_string(&self, promote: Promotion) -> String {
         let idx = [
             KomaType::Fu,
@@ -58,6 +75,10 @@ impl KomaType {
         }
     }
 
+    /// Returns Komatype from a letter.
+    ///
+    /// # Argument
+    /// * `ch` - a letter in sfen expression. one of "PLNSGBRKplnsgbrk".
     pub fn from(ch: char) -> KomaType {
         let idx = "PLNSGBRK"
             .chars()
@@ -149,6 +170,7 @@ fn tostrtest() {
     assert_eq!(k.to_string(Promotion::Promoted), "玉");
 }
 
+/// state of promotion
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Promotion {
     None,
@@ -157,12 +179,15 @@ pub enum Promotion {
 }
 
 impl Promotion {
+    /// Returns true if it is `Promoted`.
     pub fn is_promoted(&self) -> bool {
         *self == Promotion::Promoted
     }
+    /// Returns true if it is `NotPromoted`.
     pub fn is_notpromoted(&self) -> bool {
         *self == Promotion::NotPromoted
     }
+    /// Returns `String` about promotion in a move.
     pub fn to_string(&self) -> String {
         match self {
             Promotion::Promoted => String::from("成"),
@@ -188,14 +213,23 @@ fn promotest() {
     assert_eq!(prm.to_string(), "不成");
 }
 
+/// Piece
 #[derive(Clone, Debug)]
 pub struct Koma {
+    /// type of a piece.
     koma: KomaType,
+    /// promoted or not.
     promotion: Promotion,
+    /// black or white.
     teban: Teban,
 }
 
 impl Koma {
+    /// Returns `Koma`.
+    ///
+    /// # Arguments
+    /// * `ch` - piece type in sfen expression.
+    /// * `promoted` - if the piece is promoted or not.
     pub fn from(ch: char, promote: Promotion) -> Koma {
         let re = regex::Regex::new("[PLNSGBRK]").unwrap();
         Koma {
@@ -213,6 +247,12 @@ impl Koma {
         }
     }
 
+    /// Returns `Koma` from CSA expression.
+    ///
+    /// # Argument
+    /// * `csa` - 2 letters in CSA format.
+    ///           FU, KY, KE, GI, KI, KA, HI, OU, TO, NY, NE, NG, UM, RY.
+    ///           GY is same as OU here.
     pub fn fromcsa(csa: &str) -> Option<Koma> {
         let tbl = [
             ("FU", 'P', Promotion::None),
@@ -238,6 +278,8 @@ impl Koma {
         }
     }
 
+    /// Returns expression w/ text format.
+    /// blank cell will be " ・".
     pub fn to_string(&self) -> String {
         if self.teban == Teban::None || self.koma == KomaType::Aki {
             return String::from(" ・");
@@ -247,6 +289,7 @@ impl Koma {
             + &self.koma.to_string(self.promotion)
     }
 
+    /// Returns one letter japanese expression, like "龍".
     pub fn to_kstring(&self) -> Option<String> {
         if self.teban == Teban::None || self.koma == KomaType::Aki {
             return None;
@@ -254,13 +297,17 @@ impl Koma {
         Some(self.koma.to_string(self.promotion))
     }
 
+    /// Returns true when it is blank(`KomaType::Aki`).
     pub fn is_blank(&self) -> bool {
         self.koma == KomaType::Aki
     }
 
+    /// Returns true when it is black(`Teban::Sente`).
     pub fn is_sente(&self) -> bool {
         self.teban == Teban::Sente
     }
+
+    /// Returns true when it is white(`Teban::Gote`).
     pub fn is_gote(&self) -> bool {
         self.teban == Teban::Gote
     }
@@ -531,18 +578,28 @@ fn komatest() {
     assert_eq!(k.to_kstring().unwrap(), "玉");
 }
 
+/// pieces in hands.
 pub struct Tegoma {
+    /// type of the piece.
     koma: KomaType,
+    /// number of the pieces.
     num: usize,
 }
 
 impl Tegoma {
+    /// Returns `Tegoma`.
+    ///
+    /// # Arguments
+    /// * `p` - a letter in sfen expression.
+    /// * 'n' - number of the pieces.
     pub fn new(p: char, n: usize) -> Tegoma {
         Tegoma {
             koma: KomaType::from(p),
             num: n,
         }
     }
+
+    /// Returns kanji expression or an error message.
     pub fn to_kanji(&self) -> Result<String, String> {
         let kanji = self.koma.to_string(Promotion::None);
         let kanjinum = [
@@ -580,6 +637,13 @@ fn testegoma() {
     }
 }
 
+/// read text for a dan(row).
+///
+/// # Argument
+/// * `txt` - text for a dan in sfen format.
+///
+/// # Return value
+/// a list(vector) of `Koma` or error message.
 fn extractdan(txt: &str) -> Result<Vec<Koma>, String> {
     let mut res = Vec::<Koma>::new();
     let masu = txt.chars();
@@ -605,6 +669,10 @@ fn extractdan(txt: &str) -> Result<Vec<Koma>, String> {
 }
 
 impl Sfen {
+    /// Returns Sfen.
+    ///
+    /// # Argument
+    /// * `text` - sfen.
     pub fn new(text: &str) -> Sfen {
         let e: Vec<&str> = text.split(" ").collect();
         if e.len() < 4 {
@@ -622,6 +690,8 @@ impl Sfen {
             nteme: e[3].parse().unwrap_or(-1),
         }
     }
+
+    /// Returns teban expression in japanese or error message.
     fn tebanexp(&self) -> Result<String, String> {
         if self.teban == "b" {
             return Ok(String::from("先手の番です。"));
@@ -637,6 +707,8 @@ impl Sfen {
         }
         Err(format!("{} is invalid teban expression.", self.teban))
     }
+
+    /// Returns array of Koma on board or error message.
     pub fn extractban(&self) -> Result<Vec<Vec<Koma>>, String> {
         let mut masus: Vec<Vec<Koma>> = Vec::new();
         let vdan: Vec<&str> = self.ban.split("/").collect();
@@ -648,6 +720,8 @@ impl Sfen {
         }
         return Ok(masus);
     }
+
+    /// Returns tuple of Tegomas or error message.
     fn extracttegoma(&self) -> Result<(Vec<Tegoma>, Vec<Tegoma>), String> {
         let resente = Regex::new("[PLNSGBRK]").unwrap();
         let regote = Regex::new("[plnsgbrk]").unwrap();
@@ -673,6 +747,15 @@ impl Sfen {
         Ok((sentegoma, gotegoma))
     }
 
+    /// dump in BOD format.
+    ///
+    /// # Arguments.
+    /// * `sn` - sente's name.
+    /// * `gn` - gote's name.
+    /// * `title` - title.
+    /// * `lm` - last move.
+    /// # Return value
+    /// BOD format text.
     pub fn dump(&self, sn: &str, gn: &str, title: &str, lm: LastMove) -> String {
         let border = "+---------------------------+\n";
         let dannum = "一二三四五六七八九";
@@ -741,6 +824,13 @@ impl Sfen {
         }
     }
 
+    /// build svg tag to point out last move cell.
+    ///
+    /// # Arguments
+    /// * `suji` - column number.
+    /// * 'dan' - row number.
+    /// # Return value
+    /// SVG tag.
     fn build_lastmove(&self, suji: usize, dan: usize) -> Tag {
         let mut glm = Tag::new("g");
         glm.newattrib("id", "lastmove");
@@ -763,6 +853,12 @@ impl Sfen {
         glm
     }
 
+    /// build board svg tag.
+    ///
+    /// # Argument
+    /// * `lastmove` - cell index.
+    /// # Return value
+    /// SVG tag or error message.
     fn buildboard(&self, lastmove: Option<(usize, usize)>) -> Result<Tag, String> {
         match self.extractban() {
             Ok(ban) => {
@@ -798,6 +894,10 @@ impl Sfen {
         }
     }
 
+    /// build svg tag about pieces in hands.
+    ///
+    /// # Return value
+    /// SVG tag or error message.
     pub fn buildtegoma(&self) -> Result<(Tag, Tag), String> {
         match self.extracttegoma() {
             Ok((sentegoma, gotegoma)) => {
@@ -876,6 +976,12 @@ impl Sfen {
         }
     }
 
+    /// build svg tag about sente's name.
+    ///
+    /// # Argument
+    /// * `name` - sente's name.
+    /// # Return value
+    /// SVG tag.
     fn build_sentename(&self, name: Option<String>) -> Tag {
         let mut gs = Tag::new("g");
         gs.newattrib("id", "sname");
@@ -921,6 +1027,12 @@ impl Sfen {
         gs
     }
 
+    /// build svg tag about gote's name.
+    ///
+    /// # Argument
+    /// * `name` - gote's name.
+    /// # Return value
+    /// SVG tag.
     fn build_gotename(&self, name: Option<String>) -> Tag {
         let mut gg = Tag::new("g");
         gg.newattrib("id", "gname");
@@ -963,6 +1075,12 @@ impl Sfen {
         gg
     }
 
+    /// build svg tag for title.
+    /// 
+    /// # Argument
+    /// * 'title' - title.
+    /// # Return value
+    /// SVG Tag.
     fn build_title(&self, title: Option<String>) -> Option<Tag> {
         if title.is_none() {
             return None;
@@ -992,6 +1110,12 @@ impl Sfen {
         Some(gt)
     }
 
+    /// build svg tag to show turn.
+    /// 
+    /// # Argument
+    /// * `teban` - turn.
+    /// # Return value
+    /// SVG Tag.
     fn build_teban(&self, teban: String) -> Option<Tag> {
         let mut gt = Tag::new("g");
         gt.newattrib("id", "teban");
@@ -1092,6 +1216,16 @@ impl Sfen {
         Some(gt)
     }
 
+    /// make SVG.
+    /// 
+    /// # Argument
+    /// * `lastmove` - cell index to highlight.
+    /// * `turn` - turn.
+    /// * `sname` - sente's name.
+    /// * `gname` - gote's name.
+    /// * `title` - title.
+    /// # Return value
+    /// SVG.
     pub fn to_svg(
         &self,
         lastmove: Option<(usize, usize)>,
@@ -1132,6 +1266,14 @@ impl Sfen {
     }
 }
 
+/// make a tag for a koma at some cell.
+///
+/// # Arguments
+/// * `koma` - koma to be converted.
+/// * `x` - x coordinate. suji in other word.
+/// * `y` - x coordinate. dan in other word.
+/// # Return value
+/// SVG tag.
 fn komatag(k: &Koma, x: i32, y: i32) -> Option<Tag> {
     if k.is_blank() {
         return None;
@@ -1167,6 +1309,7 @@ fn komatag(k: &Koma, x: i32, y: i32) -> Option<Tag> {
     Some(kt)
 }
 
+/// build board borders.
 fn banborder() -> Tag {
     let mut ret = Tag::new("g");
     ret.newattrib("id", "ban");
@@ -1264,16 +1407,24 @@ fn banborder() -> Tag {
     ret
 }
 
+/// Last move
 #[derive(Debug)]
 pub struct LastMove {
+    /// cell index before move.
     pub from: (usize, usize),
+    /// cell index after move.
     pub to: (usize, usize),
+    /// koma.
     pub koma: sfen::Koma,
+    /// promoted or not.
     pub promote: sfen::Promotion,
+    /// 'R' => "右", 'L' => "左", 'A' => "上", 'U' => "上",
+    /// 'H' => "引", 'S' => "下", 'D' => "下", 'Y' => "寄", 'C' => "直",
     pub dir: String,
 }
 
 impl LastMove {
+    /// Returns LastMove.
     pub fn new() -> LastMove {
         LastMove {
             from: (0, 0),
@@ -1283,7 +1434,12 @@ impl LastMove {
             dir: String::new(),
         }
     }
-    // 7776FUPNLRAHCY
+    /// read last move style text like "7776FUPNLRAHCY".
+    /// 
+    /// # Argument
+    /// * `txt` - last move style. (from)(to)(koma)(dir).
+    /// # Return value
+    /// LastMove or error message.
     pub fn read(txt: &str) -> Result<LastMove, String> {
         let mut lm = LastMove {
             from: (0, 0),
@@ -1334,9 +1490,11 @@ impl LastMove {
             }
         }
     }
+    /// Returns if to-cell is ok or not.
     pub fn is_ok(&self) -> bool {
         self.to.0 > 0 && self.to.1 > 0
     }
+    /// Returns to-cell index.
     pub fn topos(&self) -> Option<(usize, usize)> {
         if self.is_ok() {
             Some(self.to)
@@ -1344,9 +1502,11 @@ impl LastMove {
             None
         }
     }
+    /// Returns if the move is from hand.
     pub fn is_from_komadai(&self) -> bool {
         self.from.0 == 0 && self.from.1 == 0
     }
+    /// Returns text style expression or error message.
     pub fn to_string(&self) -> Result<String, String> {
         if !self.is_ok() {
             return Ok(String::new());

@@ -1,15 +1,35 @@
 use super::*;
 
+/// Options specified in command line args.
+/// See 'options:' section in Readme.md.
 #[derive(Debug)]
 pub struct MyOptions {
+    /// port number to listen.
     pub port: String,
+    /// log path to put.
     pub logpath: String,
+    /// svg2png type.
     pub svg2png: svg2png::Type,
+    /// background color.
     pub bgcolor: String,
+    /// foreground color.
     pub fgcolor: String,
 }
 
 impl MyOptions {
+    /// instantiate MyOptions.
+    ///
+    /// # Arguments
+    /// * `args` - args from command line.
+    ///
+    /// # Return value
+    /// instance of MyOptions.<br>
+    /// default:<br>
+    /// - port: "7582"
+    /// - logpath: ""
+    /// - svg2png: svg2png::Type::RSVG
+    /// - bgcolor: "white"
+    /// - fgcolor: "black"
     pub fn new(args: Vec<String>) -> MyOptions {
         let mut opt = MyOptions {
             port: String::from("7582"),

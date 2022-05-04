@@ -20,12 +20,19 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    - name: build doc
+      run: cargo doc
+    - name: Archive doc
+      uses: actions/upload-artifact@v3
+      with:
+        name: sfenimageserver-doc
+        path: target/doc/sfenimageserver
     - name: Usecase test
       run: |
         sudo apt install librsvg2-bin
         ./test/usecase.sh
     - name: save log
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: usecase log
         path: |
