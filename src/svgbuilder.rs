@@ -1,18 +1,32 @@
+/// Attribute in a tag.
 pub struct Attrib {
+    /// attribute name.
     name: String,
+    /// attibute value.
     val: String,
 }
 
 impl Attrib {
+    /// Returns Attrib.
+    ///
+    /// # Arguments
+    /// * `nm` - attribute name.
+    /// * `val` - attribute value.
     pub fn new(nm: &str, val: String) -> Attrib {
         Attrib {
             name: String::from(nm),
             val: val,
         }
     }
+    /// Returns Attrib.
+    ///
+    /// # Arguments
+    /// * `nm` - attribute name.
+    /// * `val` - attribute value.
     pub fn from(nm: &str, val: &str) -> Attrib {
         Attrib::new(nm, val.to_string())
     }
+    /// Returns "name=value".
     pub fn to_string(&self) -> String {
         if self.val.is_empty() {
             format!(" {}", self.name)
