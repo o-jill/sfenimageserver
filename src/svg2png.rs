@@ -1,17 +1,22 @@
 use std::io::Write;
 
+/// Converter type.
 #[derive(Clone, Copy, Debug)]
 pub enum Type {
     RSVG,
     INKSCAPE11,
 }
 
+/// config for converter.
 pub struct Svg2PngConfig {
+    /// Converter type.
     pub typ: Type,
+    /// background color.
     pub bgcolor: String,
 }
 
 impl Svg2PngConfig {
+    /// Returns Svg2PngConfig{Type::RSVG, "white"}.
     pub fn new() -> Svg2PngConfig {
         Svg2PngConfig {
             typ: Type::RSVG,
@@ -20,6 +25,13 @@ impl Svg2PngConfig {
     }
 }
 
+/// start converting.
+/// 
+/// # Arguments
+/// * `svg` - svg image text.
+/// * `opt` - converter config.
+/// # Return value
+/// PNG data or error message.
 pub fn start(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     match opt.typ {
         Type::RSVG => start_rsvg(svg, opt),
@@ -27,7 +39,13 @@ pub fn start(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     }
 }
 
-// w/ rsvg-convert version 2.50
+/// convert w/ rsvg-convert version 2.50
+/// 
+/// # Arguments
+/// * `svg` - svg image text.
+/// * `opt` - converter config.
+/// # Return value
+/// PNG data or error message.
 #[allow(dead_code)]
 pub fn start_rsvg(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     let mut cmd = match std::process::Command::new("rsvg-convert")
@@ -59,7 +77,13 @@ pub fn start_rsvg(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     }
 }
 
-// w/ inkscape version 1.1
+/// convert w/ inkscape version 1.1
+///
+/// # Arguments
+/// * `svg` - svg image text.
+/// * `opt` - converter config.
+/// # Return value
+/// PNG data or error message.
 #[allow(dead_code)]
 pub fn start_inkscape(svg: String, opt: Svg2PngConfig) -> Result<Vec<u8>, String> {
     let mut cmd = match std::process::Command::new("inkscape")
