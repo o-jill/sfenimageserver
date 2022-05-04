@@ -141,6 +141,9 @@ impl Tag {
             .join("")
     }
     /// Returns tag text of all children.
+    ///
+    /// # Argument
+    /// * `indent` - indent text.
     pub fn child2string(&self, indent: &str) -> String {
         self.children
             .iter()
